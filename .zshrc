@@ -103,3 +103,8 @@ fi
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 [[ ! -f ~/$DOTFILES/p10k.zsh ]] || source ~/$DOTFILES/p10k.zsh
+
+# pnpm
+export PNPM_HOME="/Users/mateusz/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+# pnpm end
