@@ -72,7 +72,7 @@ cask 'transmit'
 cask 'notion'
 cask 'obsidian'
 cask 'grammarly-desktop'
-cask 'logitech-options'
+cask 'logi-options-plus'
 cask 'mochi'
 cask 'warp'
 
