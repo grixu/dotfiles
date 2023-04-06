@@ -11,7 +11,6 @@ tap 'shivammathur/extensions'
 # Binaries
 brew 'bash' # Latest Bash version
 brew 'coreutils' # Those that come with macOS are outdated
-brew 'ffmpeg'
 brew 'gh'
 brew 'git'
 brew 'gnupg'
@@ -21,7 +20,6 @@ brew 'hub'
 brew 'mackup'
 brew 'mas' # Mac App Store manager
 brew 'pkg-config' # https://github.com/driesvints/dotfiles/issues/20
-brew 'svn'
 brew 'trash' # Manage the Trash bin
 brew 'tree' # List directories in a tree structure
 brew 'zlib' # Needed for Memcached
@@ -37,9 +35,10 @@ brew 'glances'
 brew 'procs'
 brew 'dog'
 brew 'glow'
+brew 'pnpm'
 
 # Development
-brew 'postegresql'
+brew 'postegresql@14'
 brew 'nvm'
 brew 'imagemagick'
 brew 'awscli'
@@ -94,6 +93,4 @@ mas 'Amphetamine', id: 937984704
 mas 'Magnet', id: 441258766
 mas 'Reeder 5', id: 1529448980
 mas 'Endel', id: 1484348796
-mas 'JW Library', id: 672417831
-mas 'Xiaomi Home', id: 957323480
 mas 'Xcode', id: 497799835
