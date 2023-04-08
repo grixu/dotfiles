@@ -36,6 +36,7 @@ brew 'procs'
 brew 'dog'
 brew 'glow'
 brew 'pnpm'
+brew 'signal'
 
 # Development
 brew 'postegresql@14'
