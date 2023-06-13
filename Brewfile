@@ -35,8 +35,6 @@ brew 'glances'
 brew 'procs'
 brew 'dog'
 brew 'glow'
-brew 'pnpm'
-brew 'signal'
 
 # Development
 brew 'postegresql@14'
@@ -55,27 +53,31 @@ brew 'rustup-init'
 cask '1password'
 cask 'android-studio'
 cask 'cleanshot'
+cask 'crossover'
 cask 'dash'
-cask 'docker'
 cask 'dropbox'
+cask 'discord'
 cask 'fantastical'
 cask 'google-chrome'
 cask 'google-chrome-canary'
-cask 'raycast'
-cask 'slack'
-cask 'tableplus'
-cask 'the-unarchiver'
-cask 'paw'
-cask 'tint'
-cask 'vlc'
-cask 'visual-studio-code'
-cask 'transmit'
+cask 'mochi'
 cask 'notion'
 cask 'obsidian'
+cask 'orbstack'
+cask 'rapidapi'
+cask 'raycast'
+cask 'signal'
+cask 'spotify'
+cask 'tableplus'
+cask 'the-unarchiver'
+cask 'tint'
+cask 'transmit'
+cask 'vlc'
+cask 'visual-studio-code'
 cask 'grammarly-desktop'
 cask 'logi-options-plus'
-cask 'mochi'
 cask 'warp'
+cask 'zoom'
 
 
 # Fonts
@@ -95,3 +97,5 @@ mas 'Magnet', id: 441258766
 mas 'Reeder 5', id: 1529448980
 mas 'Endel', id: 1484348796
 mas 'Xcode', id: 497799835
+mas 'Flow', id: 1423210932
+mas 'Smart Countdown Timer', id: 1410709951

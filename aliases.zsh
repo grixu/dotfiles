@@ -61,6 +61,7 @@ alias flush-redis="redis-cli FLUSHALL"
 
 # VSCode
 alias code='open -a "/Applications/Visual Studio Code.app" "`pwd`"'
+alias code-insiders='open -a "/Applications/Visual Studio Code - Insiders.app" "`pwd`"'
 
 # Better versions of some unix utilities
 alias cat='bat'
