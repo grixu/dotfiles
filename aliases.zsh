@@ -10,9 +10,7 @@ alias c="clear"
 # Directories
 alias dotfiles="cd $DOTFILES"
 alias library="cd $HOME/Library"
-alias sites="cd $HOME/Sites"
-alias lara="sites && cd laravel/"
-alias docs="lara && cd docs/"
+alias as="cd $HOME/archisquad"
 
 # Laravel
 alias a="php artisan"
@@ -32,9 +30,6 @@ alias watch="npm run watch"
 # Docker
 alias docker-composer="docker compose"
 
-# SQL Server
-alias mssql="docker run -e ACCEPT_EULA=Y -e SA_PASSWORD=poiu4014 -p 1433:1433 mcr.microsoft.com/mssql/server:2017-latest"
-
 # Git
 alias gst="git status"
 alias gb="git branch"
@@ -52,9 +47,6 @@ alias resolve="git add . && git commit --no-edit"
 alias stash="git stash -u"
 alias unstage="git restore --staged ."
 alias wip="commit wip"
-
-# Brew
-alias abrew="/opt/homebrew/bin/brew"
 
 # Redis
 alias flush-redis="redis-cli FLUSHALL"

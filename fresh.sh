@@ -43,8 +43,8 @@ nvm install 18
 nvm use 18
 nvm alias default 18
 
-echo "Install yarn using npm"
-npm -g install yarn
+echo "Install pnpm using npm"
+npm -g install pnpm
 
 echo "Creating directories for projects"
 mkdir $HOME/vsf

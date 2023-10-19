@@ -37,7 +37,7 @@ brew 'dog'
 brew 'glow'
 
 # Development
-brew 'postegresql@14'
+brew 'postgresql@16'
 brew 'nvm'
 brew 'imagemagick'
 brew 'awscli'
@@ -61,7 +61,6 @@ cask 'fantastical'
 cask 'google-chrome'
 cask 'google-chrome-canary'
 cask 'mochi'
-cask 'notion'
 cask 'obsidian'
 cask 'orbstack'
 cask 'rapidapi'
@@ -78,7 +77,8 @@ cask 'grammarly-desktop'
 cask 'logi-options-plus'
 cask 'warp'
 cask 'zoom'
-
+cask 'freedom'
+cask 'todoist'
 
 # Fonts
 cask 'font-lato'
