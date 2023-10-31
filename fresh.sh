@@ -59,9 +59,6 @@ echo "Configuring system..."
 rm -rf $HOME/.zshrc
 ln -s $HOME/.dotfiles/.zshrc $HOME/.zshrc
 
-# Symlink the Mackup config file to the home directory
-ln -s $HOME/.dotfiles/.mackup.cfg $HOME/.mackup.cfg
-
 # Setting up git
 git config --global user.email "mateusz.gostanski@gmail.com"
 git config --global user.name "Mateusz Gostański"
