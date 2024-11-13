@@ -15,6 +15,7 @@ brew 'coreutils' # Those that come with macOS are outdated
 brew 'diff-so-fancy'
 brew 'dog'
 brew 'duf'
+brew 'eza'
 brew 'ffmpeg'
 brew 'fx'
 brew 'gh'
@@ -87,6 +88,10 @@ cask 'vlc'
 cask 'warp'
 cask 'webstorm'
 cask 'zoom'
+cask 'freedom'
+cask 'todoist'
+cask 'languagetool'
+cask 'chatgpt'
 
 # Fonts
 cask 'font-lato'
