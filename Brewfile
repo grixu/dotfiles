@@ -4,6 +4,7 @@ tap 'homebrew/cask-fonts'
 tap 'homebrew/cask-versions'
 tap 'homebrew/bundle'
 tap 'nicoverbruggen/homebrew-cask'
+tap 'jacobbednarz/tap'
 tap 'shivammathur/php'
 tap 'shivammathur/extensions'
 tap 'oven-sh/bun'
@@ -13,7 +14,6 @@ brew 'bash' # Latest Bash version
 brew 'bat'
 brew 'coreutils' # Those that come with macOS are outdated
 brew 'diff-so-fancy'
-brew 'dog'
 brew 'duf'
 brew 'eza'
 brew 'ffmpeg'
@@ -70,7 +70,8 @@ cask 'cleanshot'
 cask 'chatgpt'
 cask 'dash'
 cask 'discord'
-cask 'freedom'
+cask 'elgato-stream-deck'
+cask 'focusrite-control-2'
 cask 'google-chrome'
 cask 'google-chrome@canary'
 cask 'google-cloud-sdk'
@@ -91,10 +92,6 @@ cask 'vlc'
 cask 'warp'
 cask 'webstorm'
 cask 'zoom'
-cask 'freedom'
-cask 'todoist'
-cask 'languagetool'
-cask 'chatgpt'
 
 # Fonts
 cask 'font-lato'
@@ -106,9 +103,6 @@ cask 'font-fira-code'
 mas 'Keynote', id: 409183694
 mas 'Amphetamine', id: 937984704
 mas 'Magnet', id: 441258766
-mas 'Reeder 5', id: 1529448980
-mas 'Endel', id: 1484348796
 mas 'Xcode', id: 497799835
-mas 'Flow', id: 1423210932
 mas 'Smart Countdown Timer', id: 1410709951
 mas 'WhatsApp', id: 310633997

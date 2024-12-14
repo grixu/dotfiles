@@ -1,9 +1,14 @@
 #!/bin/sh
 
-echo "Cloning repositories..."
-
 ARCHISQUAD=$HOME/archisquad
 GRIXU=$HOME/grixu
+
+echo "Creating directories for projects"
+mkdir $HOME/vsf
+mkdir $ARCHISQUAD
+mkdir $GRIXU
+
+echo "Cloning repositories..."
 
 # archisquad
 git clone git@github.com:archisquad/repository.git $ARCHISQUAD/repository

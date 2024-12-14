@@ -40,16 +40,10 @@ export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 nvm install 18
-nvm use 18
-nvm alias default 18
-
-echo "Install pnpm using npm"
-npm -g install pnpm
-
-echo "Creating directories for projects"
-mkdir $HOME/vsf
-mkdir $HOME/architower
-mkdir $HOME/grixu
+nvm install 22
+nvm use 22
+nvm alias default 22
+corepack enable
 
 echo "Cloning repositories"
 ./$HOME/.dotfiles/clone.sh
