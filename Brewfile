@@ -107,3 +107,4 @@ mas 'Magnet', id: 441258766
 mas 'Xcode', id: 497799835
 mas 'Smart Countdown Timer', id: 1410709951
 mas 'WhatsApp', id: 310633997
+mas 'Balance', id: 1637311725
