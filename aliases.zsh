@@ -58,5 +58,4 @@ alias code-insiders='open -a "/Applications/Visual Studio Code - Insiders.app" "
 # Better versions of some unix utilities
 alias cat='bat'
 alias ls='eza'
-alias du='duf'
 alias dig='dog'
