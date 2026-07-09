@@ -104,10 +104,23 @@ fi
 
 [[ ! -f ~/$DOTFILES/p10k.zsh ]] || source ~/$DOTFILES/p10k.zsh
 
+# opencode
+export PATH=/Users/mateusz/.opencode/bin:$PATH
+export PATH="/Users/mateusz/bin:$PATH"
+
+# Vite+ bin (https://viteplus.dev)
+. "$HOME/.vite-plus/env"
+
+# Browser-Use
+export PATH="/Users/mateusz/.browser-use-env/bin:/Users/mateusz/.local/bin:$PATH"
+
 # pnpm
 export PNPM_HOME="/Users/mateusz/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+# Do NOT add $PNPM_HOME (root) to PATH: pnpm 11 manages global bins in
+# $PNPM_HOME/bin (added via path.zsh). Keeping the root on PATH let stale
+# leftover shims there shadow the pnpm-managed ones (e.g. broke `ccs update`).
 # pnpm end
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/mateusz/.local/bin:$PATH"

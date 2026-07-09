@@ -8,6 +8,10 @@ alias phpstorm='open -a /Applications/PhpStorm.app "`pwd`"'
 alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 alias c="clear"
 
+# Python
+alias python="python3"
+alias pip="pip3"
+
 # Directories
 alias dotfiles="cd $DOTFILES"
 alias library="cd $HOME/Library"
@@ -40,6 +44,7 @@ alias gcn="git commit --no-verify -m"
 alias diff="git diff"
 alias force="git push --force"
 alias nuke="git clean -df && git reset --hard"
+alias clean="git clean -fd"
 alias pop="git stash pop"
 alias pull="git pull"
 alias push="git push"
@@ -47,6 +52,7 @@ alias resolve="git add . && git commit --no-edit"
 alias stash="git stash -u"
 alias unstage="git restore --staged ."
 alias wip="commit wip"
+alias b="git branch --show-current | pbcopy"
 
 # Redis
 alias flush-redis="redis-cli FLUSHALL"
@@ -58,4 +64,6 @@ alias code-insiders='open -a "/Applications/Visual Studio Code - Insiders.app" "
 # Better versions of some unix utilities
 alias cat='bat'
 alias ls='eza'
-alias dig='dog'
+
+alias ccw='ccs work --dangerously-skip-permissions'
+alias ccp='ccs personal --dangerously-skip-permissions'
