@@ -64,6 +64,3 @@ alias code-insiders='open -a "/Applications/Visual Studio Code - Insiders.app" "
 # Better versions of some unix utilities
 alias cat='bat'
 alias ls='eza'
-
-alias ccw='ccs work --dangerously-skip-permissions'
-alias ccp='ccs personal --dangerously-skip-permissions'

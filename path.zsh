@@ -21,7 +21,7 @@ export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/Library/pnpm/bin:$PATH"
+export PATH="$HOME/Library/pnpm:$PATH"
 
 # Make sure coreutils are loaded before system commands
 # I've disabled this for now because I only use "ls" which is
@@ -31,3 +31,5 @@ export PATH="$HOME/Library/pnpm/bin:$PATH"
 # PHP 8.1
 #export PATH="/usr/local/homebrew/opt/php@8.1/bin:$PATH"
 #export PATH="/usr/local/homebrew/opt/php@8.1/sbin:$PATH"
+
+source $HOME/.dotfiles/secrets.sh
