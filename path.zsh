@@ -21,7 +21,7 @@ export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/Library/pnpm:$PATH"
+export PATH="$HOME/Library/pnpm:$HOME/Library/pnpm/bin:$PATH"
 
 # Make sure coreutils are loaded before system commands
 # I've disabled this for now because I only use "ls" which is
