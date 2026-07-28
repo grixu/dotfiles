@@ -1,0 +1,38 @@
+# Wygląd i czcionka
+font-family = "MonoLisa"
+font-size = 16.0
+#theme = catppuccin-mocha
+background-opacity = 1.0
+
+# Narzut okna i marginesy
+window-padding-x = 8
+window-padding-y = 10
+window-decoration = true
+
+# Zachowanie i wydajność
+term = xterm-256color
+macos-option-as-alt = right
+macos-titlebar-style = tabs
+cursor-style = block
+shell-integration = zsh
+
+# Kluczowa zmiana pod tmuxa: wyłączenie zbędnych skrótów okien Ghostty
+keybind = super+d=unbind
+keybind = super+shift+d=unbind
+
+# Polskie ogonki
+keybind = alt+a=unbind
+keybind = alt+c=unbind
+keybind = alt+s=unbind
+keybind = alt+e=unbind
+keybind = alt+o=unbind
+keybind = alt+l=unbind
+keybind = alt+z=unbind
+keybind = alt+x=unbind
+keybind = alt+n=unbind
+
+# Przekierowanie Command
+keybind = super+a=text:\x01
+
+# Skróty klawiszowe
+#keybind = super+shift+r=prompt:ghostty.rename-tab

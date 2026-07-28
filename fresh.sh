@@ -53,6 +53,15 @@ echo "Configuring system..."
 rm -rf $HOME/.zshrc
 ln -s $HOME/.dotfiles/.zshrc $HOME/.zshrc
 
+rm -rf $HOME/.tmux.conf
+ln -s $HOME/.dotfiles/tmux/tmux.conf $HOME/.tmux.conf
+
+# Ghostty loads the Application Support config after the XDG one and would
+# override it, so that copy must not survive alongside the symlink.
+mkdir -p $HOME/.config/ghostty
+rm -rf $HOME/.config/ghostty/config.ghostty "$HOME/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
+ln -s $HOME/.dotfiles/ghostty/config.ghostty $HOME/.config/ghostty/config.ghostty
+
 # Setting up git
 git config --global user.email "mateusz.gostanski@gmail.com"
 git config --global user.name "Mateusz Gostański"
