@@ -35,4 +35,6 @@ keybind = alt+n=unbind
 keybind = super+a=text:\x01
 
 # Skróty klawiszowe
-#keybind = super+shift+r=prompt:ghostty.rename-tab
+# prompt_tab_title, nie prompt_surface_title: tmux ciągle przestawia tytuł
+# sekwencjami ucieczki, a tylko tytuł taba wygrywa z tym, co ustawia terminal.
+keybind = super+shift+r=prompt_tab_title
