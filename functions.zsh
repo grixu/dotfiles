@@ -81,7 +81,15 @@ _cc_launch_session() {
     # Generowanie nazwy sesji
     local session_name REPLY
     if [[ -n "$custom_name" ]]; then
-        session_name=$(_cc_sanitize_session_name "${profile_prefix}_${custom_name}")
+        local base_name suffix=2
+        base_name=$(_cc_sanitize_session_name "${profile_prefix}_${custom_name}")
+        session_name="$base_name"
+        # tmux new-session -A na istniejącej sesji tylko się podpina i milcząco
+        # porzuca polecenie — razem z flagami ccs. Numerujemy aż do wolnej nazwy.
+        while tmux has-session -t "=$session_name" 2>/dev/null; do
+            session_name="${base_name}-${suffix}"
+            (( suffix++ ))
+        done
     else
         local dir_name="${PWD:t}"
         # Drugie wywołanie w tym samym katalogu ma dostać własną sesję, a nie
