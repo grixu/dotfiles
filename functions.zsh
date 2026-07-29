@@ -47,12 +47,13 @@ _cc_launch_session() {
     local ccs_base_cmd="$2"     # np. 'ccs w'
     shift 2
 
-    # Normalizacja argumentów pod iOS (em-dash / en-dash -> myślniki)
+    # Smart punctuation zamienia wpisane "--" na pauzę (macOS) albo półpauzę
+    # (iOS) — obie muszą wrócić do "--", inaczej getopt widzi klaster krótkich flag.
     local -a normalized_args=()
     local arg
     for arg in "$@"; do
         arg="${arg/#—/--}"
-        arg="${arg/#–/-}"
+        arg="${arg/#–/--}"
         normalized_args+=( "$arg" )
     done
 
