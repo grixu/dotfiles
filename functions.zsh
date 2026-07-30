@@ -122,6 +122,14 @@ ccp() {
     _cc_launch_session "priv" "ccs personal --dangerously-skip-permissions" "$@"
 }
 
+ccm() {
+    _cc_launch_session "mm" "ccs mm --dangerously-skip-permissions" "$@"
+}
+
+ccz() {
+    _cc_launch_session "zai" "ccs zai --dangerously-skip-permissions" "$@"
+}
+
 # ---------------------------------------------------------
 # Szybkie podłączanie do istniejących sesji tmux
 # ---------------------------------------------------------
