@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+"""PreToolUse(search_code) nudge toward the graph tools.
+
+When a CBM text-search pattern is really a *relational* query — call sites, a class/
+type hierarchy, or imports — let the search run but remind the model that
+trace_path/search_graph answer it natively. Non-blocking by design: it returns
+permissionDecision "allow" + additionalContext, so a false match costs only one extra
+hint next to a result the model already got (no lost work, no permission friction).
+Stateless, like the bash gate — no dedup, no /tmp state.
+"""
+import json, sys, re
+
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+
+tn = data.get("tool_name")
+if tn and tn != "mcp__codebase-memory-mcp__search_code":
+    sys.exit(0)
+
+pat = ((data.get("tool_input") or {}).get("pattern") or "").strip()
+if not pat:
+    sys.exit(0)
+
+# Wide multi-term OR-sweeps are genuine text search, not one relational question.
+if pat.count("|") >= 3:
+    sys.exit(0)
+
+hint = None
+if re.search(r"\b(class|interface|trait|enum)\s+[A-Z][A-Za-z0-9_]{2,}", pat) or re.search(r"\b(extends|implements)\b", pat):
+    hint = "search_graph(name_pattern=…, label=Class/Interface/Enum) returns the definition and its type hierarchy directly"
+elif re.search(r"\bfrom\s+['\"]", pat) or re.search(r"\b(import|require)\b", pat):
+    hint = "trace_path(mode=calls) / query_graph give real dependency edges instead of textual import lines"
+elif re.search(r"[A-Za-z_][A-Za-z0-9_]{3,}\\?\(", pat):
+    hint = "for callers of that symbol trace_path(function_name, mode=callers) is exact; for its definition use search_graph(name_pattern)"
+
+if not hint:
+    sys.exit(0)
+
+msg = ("This search_code pattern looks like a relational query. " + hint +
+       ". Your search_code is proceeding — reach for the graph tool on the follow-up.")
+print(json.dumps({"hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "allow",
+    "permissionDecisionReason": "CBM relational-query hint (non-blocking)",
+    "additionalContext": msg,
+}}))
+sys.exit(0)

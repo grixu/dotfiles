@@ -1,0 +1,75 @@
+#!/bin/bash
+# PreToolUse(Bash) gate: in a CBM-indexed repo, redirect shell text-search
+# (grep/rg/...) to search_code/search_graph. On native macOS/Linux builds Claude Code
+# replaced the Grep/Glob tools with ugrep/bfs *through Bash* (changelog 2.1.117), so
+# Bash IS the code-search vector — this gate covers it.
+#
+# Design mirrors codedb's working gate while dodging the failure modes that got
+# CBM's own gate pulled (issues #188/#214/#258/#288/#384):
+#   - blocks ONLY shell search verbs, never the native Read tool (read-before-edit safe)
+#   - stateless: no /tmp file, decides purely from the command text (no $PPID/subagent bugs)
+#   - fail-open: silently allows unless this repo (or an ancestor) has a CBM graph
+#   - segment-aware: inspects each &&/;/||-joined step, so 'cd repo && grep ...' is caught;
+#     a piped 'cmd | grep ...' filtering real command output is left alone, but
+#     'cat <source/config file> | grep ...' (code search behind a pipe) is caught too
+# Any uncertainty => exit 0 (allow). Never blocks reading.
+
+command -v jq >/dev/null 2>&1 || exit 0
+
+INPUT=$(cat)
+CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')
+CWD=$(printf '%s' "$INPUT" | jq -r '.cwd // empty')
+[ -n "$CMD" ] && [ -n "$CWD" ] || exit 0
+
+CACHE_DIR="${CBM_CACHE_DIR:-$HOME/.cache/codebase-memory-mcp}"
+
+# True if DIR or any ancestor has a CBM graph on disk. Pure stat, no subprocess.
+is_indexed() {
+  local d="$1" slug
+  while [ "$d" != "/" ] && [ -n "$d" ]; do
+    slug=$(printf '%s' "$d" | sed -E 's#^/##; s#/#-#g')
+    [ -f "$CACHE_DIR/$slug.db" ] && return 0
+    d=$(dirname "$d")
+  done
+  return 1
+}
+
+# Indexed if the session cwd is in an indexed tree, or the command cd's (absolute) into one.
+INDEXED=
+is_indexed "$CWD" && INDEXED=1
+if [ -z "$INDEXED" ]; then
+  CDTARGETS=$(printf '%s' "$CMD" | grep -oE 'cd[[:space:]]+/[^[:space:]&;|]+' | sed -E 's/^cd[[:space:]]+//')
+  while IFS= read -r target; do
+    [ -n "$target" ] || continue
+    is_indexed "$target" && { INDEXED=1; break; }
+  done <<EOF
+$CDTARGETS
+EOF
+fi
+[ -n "$INDEXED" ] || exit 0
+
+# Split on &&/;/|| (and real newlines) — NOT single pipes: a piped grep usually filters
+# command output and stays allowed. Two blocks per segment: (1) leading verb is a search
+# verb; (2) a source/config file catted into a piped search verb — code search wearing a
+# pipe, the one piped case that is NOT output filtering (configs point to Read, not search_code).
+# Heredoc (not a pipe) so `exit 2` leaves the script, not a subshell.
+SEGMENTS=$(printf '%s' "$CMD" | awk '{gsub(/\|\||&&|;/,"\n"); print}')
+while IFS= read -r seg; do
+  if printf '%s' "$seg" | grep -qE "(^|[[:space:]])(cat|head|tail|bat|nl)[[:space:]]+[^|]*\.(tsx|ts|jsx|js|mjs|cjs|json5|json|yaml|yml|vue|svelte|py|go|rs|php|java|kts|kt|rb|cpp|cxx|cc|hpp|cs|swift|scala|clj|exs|ex|sql|prisma|graphql|gql|proto|scss|sass|less|css|html|htm|xml|toml|ini|conf|cfg|lock|properties|env|lua|h)(\b|[\"'[:space:]])" \
+     && printf '%s' "$seg" | grep -qE "\|[[:space:]]*(([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*|env|sudo|command|builtin|exec|nohup|time)[[:space:]]+)*(grep|rg|egrep|fgrep|ag|ack|ugrep|ug)\b"; then
+    echo "BLOCKED: catting a source/config file into a shell search ('cat <file> | grep') is code search in an indexed repo — the pipe does not make it output-filtering. Use mcp__codebase-memory-mcp__get_code_snippet or search_code for code, or the Read tool to read the file. (Real command output like 'somecmd | grep' stays fine.)" >&2
+    exit 2
+  fi
+  s=$(printf '%s' "$seg" | sed -E 's/^[[:space:]]*(env|sudo|command|builtin|exec|nohup|time)[[:space:]]+//')
+  s=$(printf '%s' "$s" | sed -E 's/^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*[[:space:]]+//')
+  verb=$(printf '%s' "$s" | awk '{print $1}')
+  case "$verb" in
+    grep|rg|egrep|fgrep|ag|ack|ugrep|ug)
+      echo "BLOCKED: this repo is indexed in Codebase Memory. For code search use mcp__codebase-memory-mcp__search_code (regex/text) or search_graph (symbols/callers); to read a known file use Read or get_code_snippet — not '$verb'. Filtering the OUTPUT of a running command (ps/git log/docker/logs) or MCP down? Piping is fine (e.g. 'somecmd | $verb ...') — only a search verb that STARTS a shell step is blocked. But 'cat <codefile> | $verb' is still code search: use search_code instead of catting a source file into $verb." >&2
+      exit 2
+      ;;
+  esac
+done <<EOF
+$SEGMENTS
+EOF
+exit 0

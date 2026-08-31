@@ -8,6 +8,7 @@ tap 'jacobbednarz/tap'
 tap 'shivammathur/php'
 tap 'shivammathur/extensions'
 tap 'oven-sh/bun'
+tap 'rjyo/moshi'
 
 # Binaries
 brew 'bash' # Latest Bash version
@@ -30,6 +31,7 @@ brew 'hub'
 brew 'jq'
 brew 'llvm'
 brew 'mas' # Mac App Store manager
+brew 'moshi-hook' # Bridges Claude Code to the Moshi iOS app
 brew 'pkg-config' # https://github.com/driesvints/dotfiles/issues/20
 brew 'procs'
 brew 'ripgrep'
@@ -40,6 +42,7 @@ brew 'zlib' # Needed for Memcached
 
 # Development
 brew 'act'
+brew 'agent-browser' # Browser automation CLI behind the agent-browser skill
 brew 'awscli'
 brew 'bun'
 brew 'cf-vault'

@@ -48,6 +48,9 @@ corepack enable
 echo "Cloning repositories"
 ./$HOME/.dotfiles/clone.sh
 
+echo "Setting up Claude Code"
+$HOME/.dotfiles/claude.sh
+
 echo "Configuring system..."
 # Removes .zshrc from $HOME (if it exists) and symlinks the .zshrc file from the .dotfiles
 rm -rf $HOME/.zshrc
