@@ -110,7 +110,10 @@ _cc_launch_session() {
     # KLUCZOWA POPRAWKA:
     # 1. $SHELL -i  -> ładuje ~/.zshrc (dzięki czemu ccs, PATH i NVM są dostępne)
     # 2. || exec $SHELL -> jeśli ccs wywali błąd, sesja NIE zamknie się, lecz zostanie w powłoce, pokazując błąd
-    tmux new-session -A -D -s "$session_name" "$SHELL -i -c \"$full_cmd || exec $SHELL\""
+    # Serwer tmux narzuca nowym panelom własne cwd — gdy katalog, z którego
+    # wystartował, zostanie usunięty, panel dziedziczy martwą ścieżkę i flaga -c
+    # tego nie obchodzi. Dlatego wchodzimy do katalogu jawnie już w panelu.
+    tmux new-session -A -D -s "$session_name" "$SHELL -i -c \"cd ${(qq)PWD} && $full_cmd || exec $SHELL\""
 }
 
 # 3. Interfejsy wywoławcze
