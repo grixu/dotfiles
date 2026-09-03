@@ -11,7 +11,7 @@ window-decoration = true
 
 # Zachowanie i wydajność
 term = xterm-256color
-macos-option-as-alt = right
+macos-option-as-alt = left
 macos-titlebar-style = tabs
 cursor-style = block
 shell-integration = zsh
