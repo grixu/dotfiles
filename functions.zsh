@@ -154,17 +154,19 @@ rc() {
 
     local i=1
     local -a session_names
-    local line name path
+    # Nie "path": w zsh to tablica sprzężona z PATH, więc przypisanie ścieżki
+    # sesji wyczyściłoby PATH do końca funkcji i tmux zniknąłby z widoku.
+    local line name session_path
 
     for line in "${lines[@]}"; do
         name="${line%%|*}"
-        path="${line#*|}"
+        session_path="${line#*|}"
 
         # Skracamy ścieżkę /Users/twoja_nazwa do ~ dla czytelności na iOS
-        path="${path/#$HOME/~}"
+        session_path="${session_path/#$HOME/~}"
 
         session_names[i]="$name"
-        printf " [%2d] %-32s %s\n" "$i" "$name" "($path)"
+        printf " [%2d] %-32s %s\n" "$i" "$name" "($session_path)"
         (( i++ ))
     done
 
