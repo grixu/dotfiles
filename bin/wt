@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 #
-# wt — create a git worktree branched off origin/main next to the repo root,
-#      seed it with local (gitignored) files, then run `pnpm install`.
+# wt — create a git worktree next to the repo root, seed it with local
+#      (gitignored) files, then run `pnpm install`.
 #
 # Usage:
 #   wt <dir-name> [branch-name]
 #
 #   <dir-name>     Directory created as a sibling of the repository root.
-#   [branch-name]  New branch name. Defaults to <dir-name>.
+#   [branch-name]  Branch to check out. Defaults to <dir-name>. An existing
+#                  local branch is used as-is; a branch that exists only on
+#                  the remote is checked out tracking it; otherwise a new
+#                  branch is cut from origin/main.
 #
 # Example (run from anywhere inside a repo at ~/code/app):
 #   wt feature-login            -> ~/code/feature-login on branch feature-login
@@ -38,18 +41,40 @@ repo_root="$(git rev-parse --show-toplevel)"
 worktree_path="$(dirname "$repo_root")/$worktree_name"
 
 [[ -e "$worktree_path" ]] && die "path already exists: $worktree_path"
-git show-ref --verify --quiet "refs/heads/$branch_name" \
-  && die "branch already exists: $branch_name"
 
-echo "==> Fetching $BASE_REF"
-# BASE_REF is "<remote>/<branch>"; fetch that remote so the base is current.
-git fetch "${BASE_REF%%/*}" "${BASE_REF#*/}" --quiet \
-  || die "failed to fetch $BASE_REF"
-git rev-parse --verify --quiet "$BASE_REF" >/dev/null \
-  || die "base ref not found: $BASE_REF"
+# BASE_REF is "<remote>/<branch>"; existing branches are looked up on that remote.
+remote="${BASE_REF%%/*}"
 
-echo "==> Creating worktree $worktree_path (branch: $branch_name)"
-git worktree add -b "$branch_name" "$worktree_path" "$BASE_REF"
+if git show-ref --verify --quiet "refs/heads/$branch_name"; then
+  echo "==> Creating worktree $worktree_path (existing local branch: $branch_name)"
+  git worktree add "$worktree_path" "$branch_name"
+else
+  remote_rc=0
+  git ls-remote --exit-code --heads "$remote" "refs/heads/$branch_name" >/dev/null \
+    || remote_rc=$?
+  # 2 means "no matching ref"; anything else is a real failure (e.g. network),
+  # which must not silently fall through to creating a duplicate branch.
+  [[ $remote_rc -eq 0 || $remote_rc -eq 2 ]] \
+    || die "failed to query remote $remote"
+
+  if [[ $remote_rc -eq 0 ]]; then
+    echo "==> Fetching $remote/$branch_name"
+    git fetch "$remote" "+refs/heads/$branch_name:refs/remotes/$remote/$branch_name" --quiet \
+      || die "failed to fetch $remote/$branch_name"
+
+    echo "==> Creating worktree $worktree_path (tracking $remote/$branch_name)"
+    git worktree add --track -b "$branch_name" "$worktree_path" "$remote/$branch_name"
+  else
+    echo "==> Fetching $BASE_REF"
+    git fetch "$remote" "${BASE_REF#*/}" --quiet \
+      || die "failed to fetch $BASE_REF"
+    git rev-parse --verify --quiet "$BASE_REF" >/dev/null \
+      || die "base ref not found: $BASE_REF"
+
+    echo "==> Creating worktree $worktree_path (new branch: $branch_name from $BASE_REF)"
+    git worktree add -b "$branch_name" "$worktree_path" "$BASE_REF"
+  fi
+fi
 
 echo "==> Copying local files"
 for file in "${LOCAL_FILES[@]}"; do
