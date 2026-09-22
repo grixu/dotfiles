@@ -116,13 +116,22 @@ _cc_launch_session() {
     tmux new-session -A -D -s "$session_name" "$SHELL -i -c \"cd ${(qq)PWD} && $full_cmd || exec $SHELL\""
 }
 
+# Mod jev-skill-suggestion czyta klucz tylko z pluginConfigs, nie z ENV, więc
+# wstrzykujemy go przez --settings. Doklejamy go dopiero w panelu: JSON w poleceniu
+# dla tmux rozbiłby cudzysłowy "$SHELL -c \"...\"", a klucz lądowałby w tmux.
+_cc_ccs_jev() {
+    local -a jev_args=()
+    [[ -n "$JEV_API_KEY" ]] && jev_args=( --settings "{\"pluginConfigs\":{\"jev-skill-suggestion@skills-dir\":{\"options\":{\"typesafeApiKey\":\"$JEV_API_KEY\"}}}}" )
+    ccs "$@" "${jev_args[@]}"
+}
+
 # 3. Interfejsy wywoławcze
 ccw() {
-    _cc_launch_session "work" "ccs work --dangerously-skip-permissions" "$@"
+    _cc_launch_session "work" "_cc_ccs_jev work --dangerously-skip-permissions" "$@"
 }
 
 ccp() {
-    _cc_launch_session "priv" "ccs personal --dangerously-skip-permissions" "$@"
+    _cc_launch_session "priv" "_cc_ccs_jev personal --dangerously-skip-permissions" "$@"
 }
 
 ccm() {
