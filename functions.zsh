@@ -121,7 +121,7 @@ _cc_launch_session() {
 # dla tmux rozbiłby cudzysłowy "$SHELL -c \"...\"", a klucz lądowałby w tmux.
 _cc_ccs_jev() {
     local -a jev_args=()
-    [[ -n "$JEV_API_KEY" ]] && jev_args=( --settings "{\"pluginConfigs\":{\"jev-skill-suggestion@skills-dir\":{\"options\":{\"typesafeApiKey\":\"$JEV_API_KEY\"}}}}" )
+    [[ -n "$TYPESAFE_API_KEY" ]] && jev_args=( --settings "{\"pluginConfigs\":{\"jev-skill-suggestion@skills-dir\":{\"options\":{\"typesafeApiKey\":\"$TYPESAFE_API_KEY\"}}}}" )
     ccs "$@" "${jev_args[@]}"
 }
 
