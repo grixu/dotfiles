@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+#
+# wt-clean — interactively pick git worktrees of the current repo and remove
+#            them. Branches are left untouched.
+#
+# Usage:
+#   wt-clean
+#
+# Keys:
+#   ↑/↓ or k/j   move
+#   Space        toggle selection
+#   a            toggle all
+#   Enter        remove selected
+#   q / Esc      quit without changes
+#
+# Worktrees with uncommitted changes (or locked ones) are confirmed one by one
+# with a y/N prompt before being force-removed.
+
+import curses
+import os
+import subprocess
+import sys
+from concurrent.futures import ThreadPoolExecutor
+
+
+def die(msg):
+    print(f"wt-clean: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def git(*args, cwd=None):
+    return subprocess.run(
+        ["git", *args], cwd=cwd, capture_output=True, text=True
+    )
+
+
+def list_worktrees():
+    out = git("worktree", "list", "--porcelain").stdout
+    entries = []
+    for block in out.strip().split("\n\n"):
+        wt = {"locked": False, "prunable": False, "branch": None, "head": ""}
+        for line in block.splitlines():
+            key, _, value = line.partition(" ")
+            if key == "worktree":
+                wt["path"] = value
+            elif key == "HEAD":
+                wt["head"] = value
+            elif key == "branch":
+                wt["branch"] = value.removeprefix("refs/heads/")
+            elif key == "locked":
+                wt["locked"] = True
+            elif key == "prunable":
+                wt["prunable"] = True
+            elif key == "bare":
+                wt["bare"] = True
+        if "path" in wt:
+            if wt["branch"] is None:
+                wt["branch"] = f"(detached {wt['head'][:7]})"
+            entries.append(wt)
+    return entries
+
+
+def is_dirty(wt):
+    if wt["prunable"]:
+        return False
+    return bool(git("status", "--porcelain", cwd=wt["path"]).stdout.strip())
+
+
+def flags(wt):
+    out = []
+    if wt["dirty"]:
+        out.append("● modified")
+    if wt["locked"]:
+        out.append("(locked)")
+    if wt["prunable"]:
+        out.append("(missing)")
+    return "  ".join(out)
+
+
+def pick(stdscr, items):
+    curses.curs_set(0)
+    curses.use_default_colors()
+    curses.init_pair(1, curses.COLOR_YELLOW, -1)
+    curses.init_pair(2, curses.COLOR_CYAN, -1)
+
+    selected = [False] * len(items)
+    cursor = 0
+    top = 0
+    name_w = max(len(os.path.basename(w["path"])) for w in items)
+    branch_w = max(len(w["branch"]) for w in items)
+
+    while True:
+        stdscr.erase()
+        height, width = stdscr.getmaxyx()
+        list_h = max(1, height - 4)
+        if cursor < top:
+            top = cursor
+        elif cursor >= top + list_h:
+            top = cursor - list_h + 1
+
+        stdscr.addnstr(0, 0, "Select worktrees to remove", width - 1, curses.A_BOLD)
+        for row, i in enumerate(range(top, min(top + list_h, len(items)))):
+            w = items[i]
+            box = "[x]" if selected[i] else "[ ]"
+            name = os.path.basename(w["path"]).ljust(name_w)
+            branch = w["branch"].ljust(branch_w)
+            line = f" {box} {name}  {branch}  "
+            attr = curses.A_REVERSE if i == cursor else curses.A_NORMAL
+            stdscr.addnstr(row + 2, 0, line, width - 1, attr)
+            if len(line) < width - 1 and flags(w):
+                stdscr.addnstr(
+                    row + 2, len(line), flags(w), width - 1 - len(line),
+                    attr | curses.color_pair(1),
+                )
+
+        footer = (
+            f"{sum(selected)} selected · space toggle · a all · "
+            "enter remove · q quit"
+        )
+        stdscr.addnstr(height - 1, 0, footer, width - 1, curses.color_pair(2))
+        stdscr.refresh()
+
+        key = stdscr.getch()
+        if key in (curses.KEY_UP, ord("k")):
+            cursor = (cursor - 1) % len(items)
+        elif key in (curses.KEY_DOWN, ord("j")):
+            cursor = (cursor + 1) % len(items)
+        elif key == ord(" "):
+            selected[cursor] = not selected[cursor]
+            cursor = min(cursor + 1, len(items) - 1)
+        elif key == ord("a"):
+            state = not all(selected)
+            selected = [state] * len(items)
+        elif key in (curses.KEY_ENTER, 10, 13):
+            return [w for w, s in zip(items, selected) if s]
+        elif key in (ord("q"), 27):
+            return []
+
+
+def confirm(question):
+    try:
+        return input(f"{question} [y/N] ").strip().lower() in ("y", "yes")
+    except EOFError:
+        return False
+
+
+def main():
+    if git("rev-parse", "--git-dir").returncode != 0:
+        die("not inside a git repository")
+
+    worktrees = list_worktrees()
+    current = os.path.realpath(git("rev-parse", "--show-toplevel").stdout.strip())
+    # The first entry is the main worktree; the current one can't remove itself.
+    candidates = [
+        w for w in worktrees[1:]
+        if os.path.realpath(w["path"]) != current
+    ]
+    if not candidates:
+        print("No worktrees to clean")
+        return
+
+    # git status is slow in large monorepos, so check all worktrees concurrently.
+    with ThreadPoolExecutor() as pool:
+        for w, dirty in zip(candidates, pool.map(is_dirty, candidates)):
+            w["dirty"] = dirty
+
+    os.environ.setdefault("ESCDELAY", "25")
+    chosen = curses.wrapper(pick, candidates)
+    if not chosen:
+        print("Nothing removed")
+        return
+
+    removed = failed = skipped = 0
+    for w in chosen:
+        name = os.path.basename(w["path"])
+        args = ["worktree", "remove"]
+        if w["dirty"] or w["locked"]:
+            reason = "has uncommitted changes" if w["dirty"] else "is locked"
+            if not confirm(f"{name} [{w['branch']}] {reason}. Remove anyway?"):
+                print(f"- skipped {name}")
+                skipped += 1
+                continue
+            # A locked worktree needs --force twice.
+            args += ["--force", "--force"] if w["locked"] else ["--force"]
+        elif w["prunable"]:
+            args.append("--force")
+
+        result = git(*args, w["path"])
+        if result.returncode == 0:
+            print(f"✓ removed {name}")
+            removed += 1
+        else:
+            print(f"✗ {name}: {result.stderr.strip()}")
+            failed += 1
+
+    print(f"\n{removed} removed, {skipped} skipped, {failed} failed")
+    sys.exit(1 if failed else 0)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(130)
